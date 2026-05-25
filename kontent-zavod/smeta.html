@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Смета v4.1 — Контент-завод (ООО Смарт Сити)</title>
+<style>
+  body { font-family: Arial, sans-serif; font-size: 13px; margin: 30px; color: #000; }
+  h1 { font-size: 16px; margin-bottom: 4px; }
+  h2 { font-size: 14px; margin-top: 28px; margin-bottom: 6px; border-bottom: 2px solid #555; padding-bottom: 3px; }
+  p { margin: 2px 0 8px; font-size: 12px; color: #444; }
+  table { border-collapse: collapse; width: 100%; margin-bottom: 14px; }
+  th { background: #ddd; text-align: left; padding: 5px 8px; border: 1px solid #aaa; font-size: 12px; }
+  td { padding: 4px 8px; border: 1px solid #ccc; vertical-align: top; font-size: 12px; }
+  tr:nth-child(even) td { background: #f7f7f7; }
+  .risk  { background: #fff3cd !important; }
+  .sub   { background: #e8e8e8 !important; font-weight: bold; }
+  .stot  { font-weight: bold; background: #d0d0d0 !important; }
+  .gtot  { font-weight: bold; background: #b0b0b0 !important; font-size: 13px; }
+  .warn  { color: #c00; font-weight: bold; }
+  .note  { font-size: 11px; color: #555; font-style: italic; }
+  .opt   { color: #555; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<h1>СМЕТА v4.1 — Контент-завод для бухгалтерской компании</h1>
+<p>Заказчик: ООО «Смарт Сити» &nbsp;|&nbsp; Версия: 4.1 (финальная с contingency-буфером и уточнёнными часами)</p>
+
+<table style="margin-bottom:10px;">
+  <tr>
+    <td style="width:25%"><strong>Ставка:</strong> 2 500 руб/ч</td>
+    <td style="width:25%"><strong>ASR субтитры:</strong> Вариант Б (AssemblyAI)</td>
+    <td style="width:25%"><strong>Сайт:</strong> JSON + pre-generated HTML (SEO)</td>
+    <td style="width:25%"><strong>Claude фоллбек:</strong> Anthropic API pay-per-use</td>
+  </tr>
+</table>
+
+<p class="note">
+  Смета v4.1. Включает всё из v4 плюс: увеличенный резерв по сайту (+2 ч), SEO-проверка индексации (+2 ч),
+  тонкая настройка субтитров под аватар (+3 ч), contingency-буфер 10% на каждый этап.
+  Часы «реал» — потолок. Резервные позиции выставляются только если фактически потребовались.
+  Contingency — явная защита от непредвиденного: если не потрачен, не выставляется.
+</p>
+
+<!-- ═══════════════════════════ ЭТАП 1 ═══════════════════════════ -->
+<h2>ЭТАП 1 — Инфраструктура, Claude Code + фоллбеки</h2>
+
+<table>
+  <tr>
+    <th style="width:38%">Задача</th>
+    <th style="width:6%">Опт</th>
+    <th style="width:6%">Реал</th>
+    <th style="width:12%">Сумма, руб</th>
+    <th style="width:38%">Комментарий / риск</th>
+  </tr>
+
+  <tr><td colspan="5" class="sub">— Базовая настройка VPS —</td></tr>
+  <tr>
+    <td>VPS Ubuntu 22.04: выбор провайдера, первичный конфиг (hostname, timezone, locale, apt upgrade)</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Безопасность: непривилегированный пользователь, SSH только по ключу, отключение root-логина и password auth</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Firewall + fail2ban: ufw (22, 80, 443), fail2ban для SSH, тест блокировки</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Docker + Docker Compose: установка, daemon (log rotation, restart policy), автостарт</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Caddy reverse proxy: Caddyfile для n8n, автоматический TLS Let's Encrypt, тест HTTPS</td>
+    <td>1</td><td>1.5</td><td>3 750</td>
+    <td>Если домен не настроен — +0.5 ч на DNS propagation.</td>
+  </tr>
+  <tr>
+    <td>n8n в Docker Compose: volume, .env, basic auth, тест запуска и доступа по домену</td>
+    <td>1</td><td>2</td><td>5 000</td>
+    <td>Частый источник проблем: конфликты портов, права на volume.</td>
+  </tr>
+  <tr>
+    <td>Бэкап volume n8n: cron-скрипт (ежедневно), архив → rclone/S3/Яндекс.Диск. Тест восстановления.</td>
+    <td>1.5</td><td>2.5</td><td>6 250</td>
+    <td>Тест восстановления обязателен — без него бэкап не считается работающим.</td>
+  </tr>
+  <tr>
+    <td>Структура папок: /prompts/, /scripts/, /logs/, /tmp/, /env/. .env.example в репо.</td>
+    <td>0.5</td><td>0.5</td><td>1 250</td><td></td>
+  </tr>
+  <tr>
+    <td>GitHub приватный репозиторий: первичный push (docker-compose, конфиги, .gitignore с .env)</td>
+    <td>0.5</td><td>0.5</td><td>1 250</td><td></td>
+  </tr>
+  <tr>
+    <td>Watchtower: автообновление Docker-образов n8n (minor/patch версии), уведомление в TG при обновлении</td>
+    <td>0.5</td><td>1</td><td>2 500</td>
+    <td>Major-версии n8n — только ручное обновление после проверки changelog.</td>
+  </tr>
+
+  <tr><td colspan="5" class="sub risk">— Claude Code на VPS: авторизация и стабильность (ГЛАВНЫЙ РИСК) —</td></tr>
+  <tr class="risk">
+    <td>Исследование способов авторизации Claude Code CLI под Max-подпиской на headless сервере (xvfb+chromium, token extraction, VNC)</td>
+    <td>2</td><td>6</td><td>15 000</td>
+    <td class="warn">OAuth сессия слетает каждые 24–48 ч. Нужно выбрать наименее хрупкий способ. Исследование входит в смету.</td>
+  </tr>
+  <tr class="risk">
+    <td>Реализация выбранного способа авторизации (VNC+noVNC или token-экстракция)</td>
+    <td>2</td><td>4</td><td>10 000</td><td></td>
+  </tr>
+  <tr class="risk">
+    <td>Python CLI-wrapper для Claude Code: retry (3 попытки), exponential backoff, circuit breaker (если 3 фейла подряд → переключение на API фоллбек), логирование каждого вызова</td>
+    <td>2</td><td>4</td><td>10 000</td>
+    <td>Wrapper — это ~100 строк Python. Но отладка circuit breaker-логики занимает время.</td>
+  </tr>
+  <tr class="risk">
+    <td>Скрипт мониторинга сессии: cron каждые 30 мин проверяет claude --version, при ошибке → алерт в TG с кнопкой «Переавторизовать» + пошаговая инструкция</td>
+    <td>1</td><td>2</td><td>5 000</td><td></td>
+  </tr>
+  <tr class="risk">
+    <td>Тест стабильности Claude Code: 48 часов непрерывной работы без вмешательства, проверка что сессия не слетела</td>
+    <td>—</td><td>2</td><td>5 000</td>
+    <td>Чистое время ожидания + мониторинг. Без этого теста этап нельзя сдать.</td>
+  </tr>
+  <tr class="risk">
+    <td>Документация переавторизации: пошаговая инструкция для заказчика (текст + скриншоты). Заказчик должен уметь восстановить сессию самостоятельно.</td>
+    <td>1</td><td>2</td><td>5 000</td><td></td>
+  </tr>
+
+  <tr><td colspan="5" class="sub">— Claude API фоллбек —</td></tr>
+  <tr>
+    <td>Anthropic API ключ (Console): конфиг в .env, тест HTTP Request к /v1/messages через n8n</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Логика автопереключения в n8n: Claude Code ошибка авторизации → автоматически тот же запрос через Anthropic API → уведомление заказчику «работаем на API фоллбеке»</td>
+    <td>1.5</td><td>3</td><td>7 500</td>
+    <td>Система продолжает публиковать даже при слёте сессии. Без этого — каждый слёт = пропущенная публикация.</td>
+  </tr>
+
+  <tr><td colspan="5" class="sub">— Мониторинг и логирование —</td></tr>
+  <tr>
+    <td>Структурированное логирование: все вызовы внешних API (Claude, Gemini, Imagen, TG) пишутся в /logs/YYYY-MM-DD.log в JSON-формате (timestamp, сервис, статус, latency, ошибка)</td>
+    <td>1</td><td>2</td><td>5 000</td>
+    <td>Без структурированных логов диагностика через месяц после сдачи невозможна.</td>
+  </tr>
+  <tr>
+    <td>Ежедневный health-check: cron в 8:50 MSK проверяет (Claude Code сессия, n8n ping, VPS диск &gt;80%, последняя успешная публикация &lt;25 ч назад) → TG-сообщение «OK» или «⚠ ВНИМАНИЕ: [что не так]»</td>
+    <td>1.5</td><td>2.5</td><td>6 250</td><td></td>
+  </tr>
+  <tr>
+    <td>UptimeRobot / Healthchecks.io: внешний мониторинг n8n endpoint, алерт если недоступен &gt;5 мин</td>
+    <td>0.5</td><td>1</td><td>2 500</td>
+    <td>Бесплатный тариф UptimeRobot достаточен.</td>
+  </tr>
+
+  <tr><td colspan="5" class="sub">— Security audit —</td></tr>
+  <tr>
+    <td>Сканирование репозитория на секреты (git-secrets / truffleHog), проверка .gitignore, проверка что .env не попал в историю коммитов</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Проверка прав файлов на VPS: /env/ (chmod 600), ключи SSH, docker socket</td>
+    <td>0.5</td><td>0.5</td><td>1 250</td><td></td>
+  </tr>
+
+  <tr><td colspan="5" class="sub">— Финализация этапа 1 —</td></tr>
+  <tr>
+    <td>Тест сдачи: claude -p «тест» через n8n SSH нода → ответ получен. Скриншот заказчику.</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Документация этапа 1 (Markdown): развернуть с нуля, восстановить из бэкапа, переавторизовать Claude, типичные ошибки</td>
+    <td>2</td><td>3</td><td>7 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Stage-окружение: отдельный Google Sheet «test» и тестовый TG-канал для прогона без публикации в прод</td>
+    <td>1</td><td>1.5</td><td>3 750</td>
+    <td>Используется во всех этапах для тестирования перед выводом в прод.</td>
+  </tr>
+
+  <tr class="stot">
+    <td>ИТОГО ЭТАП 1</td>
+    <td>~25</td><td><strong>~40</strong></td><td><strong>100 000</strong></td>
+    <td>+7 500 vs v3 за: Python wrapper, мониторинг, security audit, stage-окружение, watchtower</td>
+  </tr>
+  <tr class="risk">
+    <td>Contingency 10% этапа 1 (непредвиденное: Claude Code хуже ожидаемого, нестандартный VPS-провайдер, итерации авторизации)</td>
+    <td>—</td><td><strong>5</strong></td><td><strong>10 000</strong></td>
+    <td>Выставляется по факту потраченного. Если этап прошёл чисто — не включается в счёт.</td>
+  </tr>
+  <tr class="stot">
+    <td>ИТОГО ЭТАП 1 с contingency</td>
+    <td>~25</td><td><strong>~45</strong></td><td><strong>110 000</strong></td>
+    <td></td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════ ЭТАП 2 ═══════════════════════════ -->
+<h2>ЭТАП 2 — Поток А: Текстовый контент</h2>
+<p>Telegram + Яндекс.Дзен + Яндекс.Бизнес + Сайт (JSON+pre-gen HTML) + Imagen 3</p>
+
+<table>
+  <tr>
+    <th style="width:38%">Задача</th>
+    <th style="width:6%">Опт</th>
+    <th style="width:6%">Реал</th>
+    <th style="width:12%">Сумма, руб</th>
+    <th style="width:38%">Комментарий / риск</th>
+  </tr>
+
+  <tr><td colspan="5" class="sub">— Google Sheets: база контента —</td></tr>
+  <tr>
+    <td>Структура таблицы: все колонки (id, тема, статус, lock, дата_план, дата_факт, текст_тг/дзен/карты/сайт, url_картинки, url_тг/дзен/карты/сайт, флаг_видео, статус_видео, ошибка, лог)</td>
+    <td>1</td><td>1.5</td><td>3 750</td><td></td>
+  </tr>
+  <tr>
+    <td>Сервисный аккаунт Google: Cloud Console, JSON-ключ в .env, Google Sheets credential в n8n</td>
+    <td>1</td><td>1.5</td><td>3 750</td><td></td>
+  </tr>
+  <tr>
+    <td>Нода чтения строки «pending» + запись lock-статуса (защита от двойного запуска)</td>
+    <td>1</td><td>2</td><td>5 000</td>
+    <td>Без lock: при retry workflow публикует дубль.</td>
+  </tr>
+
+  <tr><td colspan="5" class="sub">— Генерация текстов: Claude Code / API фоллбек —</td></tr>
+  <tr>
+    <td>Schedule Trigger 09:00 MSK (UTC+3). Тест на переход летнего/зимнего времени.</td>
+    <td>0.5</td><td>1</td><td>2 500</td>
+    <td>n8n работает в UTC — ошибка с timezone = публикация в 6:00 или 12:00.</td>
+  </tr>
+  <tr>
+    <td>SSH Execute Command → Python wrapper → claude. Захват stdout, обработка stderr, парсинг ответа, таймаут 120 сек, retry 3 раза с backoff.</td>
+    <td>2</td><td>4</td><td>10 000</td><td></td>
+  </tr>
+  <tr>
+    <td>Автопереключение на Anthropic API при ошибке Claude Code (circuit breaker из wrapper). Идентичный промпт, идентичный парсинг ответа.</td>
+    <td>1</td><td>2</td><td>5 000</td><td></td>
+  </tr>
+  <tr>
+    <td>Rate limiting для всех внешних API в workflow: задержки между запросами, обработка HTTP 429, exponential backoff</td>
+    <td>1</td><td>2</td><td>5 000</td>
+    <td>Gemini Flash, Imagen, ElevenLabs, HeyGen — у каждого свои лимиты.</td>
+  </tr>
+
+  <tr><td colspan="5" class="sub">— Техническая шлифовка промптов —</td></tr>
+  <tr>
+    <td>Получение промптов от заказчика, прогон через API в тестовом режиме, выявление мусора (вводные фразы, markdown, JSON-несовместимые символы)</td>
+    <td>2</td><td>4</td><td>10 000</td>
+    <td>Промпт из чата ≠ промпт для API. Обязательный шаг.</td>
+  </tr>
+  <tr>
+    <td>Python-валидатор выхода: проверка длины (мин/макс символов для каждой площадки), отсутствия вводных фраз AI, корректности markdown для TG. Повторный запрос если валидация не прошла.</td>
+    <td>1.5</td><td>3</td><td>7 500</td>
+    <td>Без валидатора: иногда Gemini выдаёт «Вот ваш текст: ...» или обрезает на полуслове.</td>
+  </tr>
+
+  <tr><td colspan="5" class="sub">— Генерация адаптаций: Gemini Flash —</td></tr>
+  <tr>
+    <td>Google AI Studio API ключ, тест endpoint, конфиг в n8n</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Промпт-шаблоны для трёх адаптаций (Дзен / Карты / Сайт): параметризованные, хранение в /prompts/ на VPS</td>
+    <td>1</td><td>2</td><td>5 000</td><td></td>
+  </tr>
+  <tr>
+    <td>Нода лонгрида Дзен (2500–4000 знаков): запрос, валидация длины, retry если короче</td>
+    <td>1</td><td>2</td><td>5 000</td><td></td>
+  </tr>
+  <tr>
+    <td>Нода описания Яндекс.Карт (до 500 знаков): генерация, обрезка при превышении</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Нода SEO-текста для сайта: H2/H3, мета-описание (до 160 символов), title тега, slug (транслитерация темы)</td>
+    <td>1</td><td>2</td><td>5 000</td><td></td>
+  </tr>
+
+  <tr><td colspan="5" class="sub risk">— Картинки: Imagen 3 + фоллбек —</td></tr>
+  <tr class="risk">
+    <td>Проверка доступности Imagen 3 через Google AI Studio API с IP VPS (geo-блок вероятен)</td>
+    <td>0.5</td><td>2</td><td>5 000</td>
+    <td class="warn">Проверить до начала разработки этого блока. Российские IP часто блокируются.</td>
+  </tr>
+  <tr class="risk">
+    <td>Если Imagen 3 недоступен: тест и интеграция Recraft v3 API или Fal.ai FLUX. Сравнение качества, выбор, конфиг в n8n.</td>
+    <td>—</td><td>4</td><td>10 000</td>
+    <td>Резерв. Не тратится если Imagen работает.</td>
+  </tr>
+  <tr>
+    <td>Нода генерации картинки 16:9: промпт из темы, запрос, base64/URL, сохранение на VPS, проверка размера файла</td>
+    <td>1.5</td><td>2.5</td><td>6 250</td><td></td>
+  </tr>
+
+  <tr><td colspan="5" class="sub">— Публикация: Telegram —</td></tr>
+  <tr>
+    <td>Telegram Bot: BotFather, добавление в канал как admin, chat_id, тест sendMessage</td>
+    <td>0.5</td><td>0.5</td><td>1 250</td><td></td>
+  </tr>
+  <tr>
+    <td>Нода sendPhoto + caption. Логика: если len &gt; 1024 → sendPhoto без подписи + sendMessage. Экранирование Markdown v2.</td>
+    <td>1</td><td>2</td><td>5 000</td>
+    <td>Markdown v2 в TG: символы .-()+ надо экранировать. Частый источник 400 Bad Request.</td>
+  </tr>
+
+  <tr><td colspan="5" class="sub">— Публикация: Яндекс.Дзен (RSS) —</td></tr>
+  <tr>
+    <td>RSS 2.0 генератор: n8n Webhook GET, последние N строк из Sheets, валидный XML (CDATA, enclosure, pubDate RFC-822, encoding UTF-8). Тест через W3C Feed Validator.</td>
+    <td>2</td><td>4</td><td>10 000</td>
+    <td>Дзен не подхватит фид с невалидным XML или неправильным pubDate.</td>
+  </tr>
+  <tr>
+    <td>Подключение RSS в Дзен-канале, ожидание первого автозабора, проверка отображения</td>
+    <td>1</td><td>2</td><td>5 000</td>
+    <td>Фид принимается только с подтверждённого домена. Если n8n на отдельном домене — нужен CNAME или проксирование.</td>
+  </tr>
+
+  <tr><td colspan="5" class="sub risk">— Публикация: Яндекс.Бизнес / Карты —</td></tr>
+  <tr class="risk">
+    <td>Исследование API Яндекс.Бизнес для публикации постов в карточку: проверка актуальной документации, тест OAuth, тест POST поста</td>
+    <td>1</td><td>3</td><td>7 500</td>
+    <td class="warn">API для постов в карточку ограничен или недоступен публично. Высокая вероятность фоллбека.</td>
+  </tr>
+  <tr class="risk">
+    <td>Если API доступен: OAuth-регистрация, нода HTTP Request, обработка лимитов (1–2 поста/нед)</td>
+    <td>1.5</td><td>3</td><td>7 500</td><td></td>
+  </tr>
+  <tr class="risk">
+    <td>Фоллбек (обязательно в любом случае): TG-уведомление заказчику с готовым текстом + картинкой + кнопкой подтверждения ручной публикации. Фиксация в Sheets.</td>
+    <td>1</td><td>2</td><td>5 000</td><td></td>
+  </tr>
+
+  <tr><td colspan="5" class="sub risk">— Публикация: Сайт (JSON + pre-generated HTML для SEO) —</td></tr>
+  <tr class="risk">
+    <td>Аудит сайта: структура HTML, тип хостинга, права SFTP, наличие шаблона страницы. Обязателен ДО начала разработки этого блока.</td>
+    <td>1</td><td>2</td><td>5 000</td>
+    <td class="warn">Без аудита нельзя спроектировать решение.</td>
+  </tr>
+  <tr>
+    <td>posts.json: Python-скрипт обновления (append нового поста: slug, title, date, description, content_html, og_image). Единственный изменяемый файл сайта.</td>
+    <td>1</td><td>2</td><td>5 000</td><td></td>
+  </tr>
+  <tr>
+    <td>Pre-generated article HTML: Python/Jinja2 создаёт article-slug.html со статическим &lt;head&gt; (title, meta description, og:title, og:image, canonical URL) + content. Деплоится рядом с posts.json.</td>
+    <td>2</td><td>4</td><td>10 000</td>
+    <td>Решает SEO-проблему клиентского рендера. Яндекс видит полноценную HTML-страницу без JS.</td>
+  </tr>
+  <tr>
+    <td>sitemap.xml: автогенерация/обновление при каждой новой публикации (добавление &lt;url&gt; новой статьи)</td>
+    <td>0.5</td><td>1</td><td>2 500</td>
+    <td>Нужен для корректной индексации в Яндексе.</td>
+  </tr>
+  <tr>
+    <td>JS-блок для страницы блога: fetch(posts.json) → рендер списка статей с датой, заголовком, описанием. Один раз правится вёрстка сайта.</td>
+    <td>1.5</td><td>2.5</td><td>6 250</td>
+    <td>JS нужен только для списка статей. Каждая статья — статичный HTML.</td>
+  </tr>
+  <tr>
+    <td>SFTP деплой: загрузка posts.json + новый article-slug.html + sitemap.xml. retry при ошибке соединения. Тест прав доступа.</td>
+    <td>1.5</td><td>3</td><td>7 500</td><td></td>
+  </tr>
+  <tr class="risk">
+    <td>Резерв: нестандартная структура сайта, конфликты путей, ограничения хостинга</td>
+    <td>—</td><td>3</td><td>7 500</td>
+    <td>Выставляется только если фактически потребовалось.</td>
+  </tr>
+
+  <tr><td colspan="5" class="sub">— Финализация потока А —</td></tr>
+  <tr>
+    <td>Логика частичного успеха: сбой одного канала НЕ останавливает workflow. Публикует в остальные каналы, фиксирует какой канал упал, уведомляет заказчика с деталями.</td>
+    <td>2</td><td>4</td><td>10 000</td>
+    <td>Без этого: сбой Яндекс.Карт = пост не вышел нигде.</td>
+  </tr>
+  <tr>
+    <td>Обновление Sheets: статус «published», дата, URL всех каналов, тексты в колонках. Снятие lock.</td>
+    <td>1</td><td>1.5</td><td>3 750</td><td></td>
+  </tr>
+  <tr>
+    <td>Уведомление заказчику в TG: резюме (что вышло, ссылки, превью картинки, что не вышло и почему)</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Error Trigger нода: перехват всех ошибок, определение шага сбоя, уведомление в TG с указанием шага и ошибки, статус «error» в Sheets</td>
+    <td>1.5</td><td>3</td><td>7 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Очистка временных файлов (картинки, тексты) после публикации</td>
+    <td>0.5</td><td>0.5</td><td>1 250</td><td></td>
+  </tr>
+  <tr>
+    <td>Code review / рефакторинг workflow: проверка нод на дублирование, унификация error handling, проверка всех таймаутов</td>
+    <td>1</td><td>2</td><td>5 000</td>
+    <td>Новая позиция v4. Без рефакторинга workflow накапливает технический долг.</td>
+  </tr>
+  <tr>
+    <td>Тестирование в stage: 5 прогонов в тестовом Sheets + тестовом TG-канале. Фикс багов.</td>
+    <td>2</td><td>4</td><td>10 000</td><td></td>
+  </tr>
+  <tr>
+    <td>Приёмочное тестирование в проде: 7 успешных публикаций подряд во все каналы. Тест частичного сбоя (отключить один канал намеренно).</td>
+    <td>3</td><td>5</td><td>12 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Документация этапа 2: схема потока, все ноды, переменные, типичные ошибки и решения</td>
+    <td>2</td><td>3</td><td>7 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Тестирование SEO: проверка индексации новых страниц Яндекс.Вебмастер (добавление sitemap, тест fetch-as-bot), проверка OpenGraph в TG и VK превью, structured data если требуется</td>
+    <td>1</td><td>2</td><td>5 000</td>
+    <td>Новая позиция v4.1. Без этой проверки pre-gen HTML может не индексироваться из-за ошибок meta или canonical.</td>
+  </tr>
+  <tr>
+    <td>Экспорт workflow JSON в GitHub</td>
+    <td>0.5</td><td>0.5</td><td>1 250</td><td></td>
+  </tr>
+  <tr class="stot">
+    <td>ИТОГО ЭТАП 2</td>
+    <td>~45</td><td><strong>~95</strong></td><td><strong>237 500</strong></td>
+    <td>+резерв сайта до 5 ч, SEO-тест +2 ч</td>
+  </tr>
+  <tr class="risk">
+    <td>Contingency 10% этапа 2 (нестандартная структура сайта, итерации промптов с заказчиком, Яндекс.Бизнес API-сюрпризы)</td>
+    <td>—</td><td><strong>10</strong></td><td><strong>25 000</strong></td>
+    <td>Выставляется по факту потраченного.</td>
+  </tr>
+  <tr class="stot">
+    <td>ИТОГО ЭТАП 2 с contingency</td>
+    <td>~45</td><td><strong>~105</strong></td><td><strong>262 500</strong></td>
+    <td></td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════ ЭТАП 3 ═══════════════════════════ -->
+<h2>ЭТАП 3 — Поток Б: AI-видео с аватаром</h2>
+<p class="warn">⚠ Рекомендуется оформить отдельным договором. Запускать только после стабильной работы этапов 1+2 не менее 2 недель.</p>
+
+<table>
+  <tr>
+    <th style="width:38%">Задача</th>
+    <th style="width:6%">Опт</th>
+    <th style="width:6%">Реал</th>
+    <th style="width:12%">Сумма, руб</th>
+    <th style="width:38%">Комментарий / риск</th>
+  </tr>
+
+  <tr><td colspan="5" class="sub">— ElevenLabs: генерация аудио —</td></tr>
+  <tr>
+    <td>Подключение ElevenLabs API, тест /v1/text-to-speech/{voice_id}, конфиг в .env</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Нода HTTP Request: текст + voice_id, получение mp3, сохранение на VPS</td>
+    <td>1</td><td>1.5</td><td>3 750</td><td></td>
+  </tr>
+  <tr>
+    <td>Обработка лимита символов: разбивка на чанки при превышении лимита тарифа, конкатенация аудио-файлов через FFmpeg</td>
+    <td>1</td><td>2</td><td>5 000</td><td></td>
+  </tr>
+  <tr>
+    <td>ffprobe: получение длительности аудио (нужна для субтитров и определения типа публикации в TG)</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Rate limiting + backoff для ElevenLabs API</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+
+  <tr><td colspan="5" class="sub risk">— HeyGen: генерация видео (ЗОНА РИСКА: асинхронность и нестабильность) —</td></tr>
+  <tr class="risk">
+    <td>Изучение актуальной версии HeyGen API (v1 vs v2, changelog). Тест /v2/video/generate с test_mode=true (без расхода кредитов).</td>
+    <td>0.5</td><td>2</td><td>5 000</td>
+    <td class="warn">HeyGen меняет API без предупреждения. Не полагаться на примеры из интернета старше 3 месяцев.</td>
+  </tr>
+  <tr class="risk">
+    <td>Нода POST /video/generate: avatar_id, voice_id / audio_asset_id, test_mode, обработка response с video_id</td>
+    <td>1</td><td>2</td><td>5 000</td><td></td>
+  </tr>
+  <tr class="risk">
+    <td>Webhook от HeyGen (предпочтительно): регистрация callback URL в HeyGen, n8n Webhook нода принимает событие video.completed / video.failed. Устраняет необходимость поллинга.</td>
+    <td>1.5</td><td>3</td><td>7 500</td>
+    <td>Webhook надёжнее поллинга. Но требует публичного HTTPS endpoint для n8n — уже есть через Caddy.</td>
+  </tr>
+  <tr class="risk">
+    <td>Поллинг как фоллбек (если Webhook недоступен на тарифе): цикл Wait 30 сек → GET статус, максимум 30 итераций (15 мин таймаут)</td>
+    <td>1.5</td><td>3</td><td>7 500</td>
+    <td>Реализовать оба варианта, переключение через переменную в .env.</td>
+  </tr>
+  <tr class="risk">
+    <td>Скачивание MP4: wget по URL из ответа, проверка размера файла (не 0 байт), валидация через ffprobe (длительность &gt; 0, кодек H264)</td>
+    <td>0.5</td><td>1.5</td><td>3 750</td><td></td>
+  </tr>
+  <tr class="risk">
+    <td>Обработка ошибок HeyGen: failed → 1 автоматический повтор через 5 мин → если снова failed → уведомление заказчику с кодом ошибки + сохранённый текст для ручной генерации → статус «video_failed_manual» в Sheets. Workflow продолжает работу.</td>
+    <td>1</td><td>2.5</td><td>6 250</td><td></td>
+  </tr>
+
+  <tr><td colspan="5" class="sub risk">— Субтитры: ASR через AssemblyAI (Вариант Б — рекомендуется) —</td></tr>
+  <tr class="risk">
+    <td>AssemblyAI API: конфиг ключа, загрузка аудио-файла на AssemblyAI (upload endpoint), запрос транскрипции с word-level timestamps</td>
+    <td>1</td><td>2</td><td>5 000</td>
+    <td>AssemblyAI: ~$0.0115/мин. При 30 видео по 1.5 мин = ~63 руб/мес. Дешевле любой альтернативы.</td>
+  </tr>
+  <tr class="risk">
+    <td>Получение результата транскрипции (polling или Webhook AssemblyAI), парсинг word-level timestamps в SRT-формат</td>
+    <td>1</td><td>2</td><td>5 000</td><td></td>
+  </tr>
+  <tr class="risk">
+    <td>Настройка стиля субтитров (шрифт, размер, позиция, цвет, фон) — согласовать с заказчиком до реализации</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+  <tr class="risk">
+    <td>Наложение субтитров через FFmpeg subtitles filter</td>
+    <td>1</td><td>2</td><td>5 000</td><td></td>
+  </tr>
+  <tr>
+    <td><span class="opt">Вариант А (без ASR, только если заказчик письменно согласился):</span> равномерное распределение слов по времени аудио, генерация SRT. Синхронизация ±3–5 сек.</td>
+    <td colspan="2" class="opt">-5 ч</td><td class="opt">-12 500</td>
+    <td class="opt">Экономия 12 500 руб. Но качество ниже. Требует письменного согласия заказчика.</td>
+  </tr>
+
+  <tr><td colspan="5" class="sub">— FFmpeg: финальный брендинг —</td></tr>
+  <tr>
+    <td>Заставка (5 сек): если предоставлен видео-файл → concat. Если только PNG логотип → FFmpeg loop 5 сек + fade in.</td>
+    <td>1</td><td>2</td><td>5 000</td>
+    <td>Уточнить у заказчика: видеофайл заставки или PNG логотип.</td>
+  </tr>
+  <tr>
+    <td>Нижняя плашка с контактами: overlay PNG плашки, позиция, прозрачность. PNG предоставляет заказчик.</td>
+    <td>1</td><td>1.5</td><td>3 750</td><td></td>
+  </tr>
+  <tr>
+    <td>Итоговый FFmpeg pipeline: заставка + основное видео (субтитры + плашка) за один проход. Preset для Telegram: H.264, AAC, ≤50 МБ, CRF компрессия при превышении размера.</td>
+    <td>1.5</td><td>3</td><td>7 500</td>
+    <td>Telegram лимит sendVideo: 50 МБ. Нужна авто-компрессия для длинных видео.</td>
+  </tr>
+  <tr>
+    <td>FFmpeg presets: набор готовых конфигов для разных длительностей (30 сек, 1 мин, 2 мин, 3 мин). Документирование параметров.</td>
+    <td>1</td><td>1.5</td><td>3 750</td>
+    <td>Новая позиция v4. Presets упрощают поддержку и дают предсказуемое качество.</td>
+  </tr>
+
+  <tr><td colspan="5" class="sub risk">— Telegram: публикация видео —</td></tr>
+  <tr class="risk">
+    <td>Определение типа публикации: длительность ≤60 сек И квадратное → sendVideoNote (кружок). Иначе → sendVideo.</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+  <tr class="risk">
+    <td>FFmpeg crop до квадрата для кружка (HeyGen выдаёт 16:9 или 9:16): crop=min(w,h):min(w,h), масштаб 640x640. Тест что лицо аватара не обрезается.</td>
+    <td>1</td><td>2</td><td>5 000</td>
+    <td class="warn">Crop может обрезать лицо. Тестировать с реальным видео аватара заказчика.</td>
+  </tr>
+  <tr>
+    <td>Telegram нода sendVideo / sendVideoNote: загрузка файла, caption, обработка «file too large»</td>
+    <td>1</td><td>1.5</td><td>3 750</td><td></td>
+  </tr>
+
+  <tr><td colspan="5" class="sub">— Очередь задач для видео —</td></tr>
+  <tr>
+    <td>Lock-файл на VPS (/tmp/video.lock): создаётся до ElevenLabs, удаляется после публикации или при ошибке. Проверка перед стартом: если lock существует → откладывать задачу на 15 мин + уведомление в TG.</td>
+    <td>0.5</td><td>1</td><td>2 500</td>
+    <td>Не более 1 видео-процесса одновременно. VPS 4GB не выдержит FFmpeg+HeyGen download параллельно.</td>
+  </tr>
+  <tr>
+    <td><span class="opt">Опционально: Redis + BullMQ очередь (если нагрузка вырастет)</span></td>
+    <td colspan="2" class="opt">+6 ч</td><td class="opt">+15 000</td>
+    <td class="opt">Нужно если видео-публикации станут ежедневными. На старте lock-файл достаточен.</td>
+  </tr>
+
+  <tr><td colspan="5" class="sub">— Управление потоком Б —</td></tr>
+  <tr>
+    <td>Триггер по флагу в Sheets («сделать видео = TRUE»): Schedule + условие или Sheets Trigger нода</td>
+    <td>1</td><td>1.5</td><td>3 750</td><td></td>
+  </tr>
+  <tr>
+    <td>Обновление Sheets: статус «video_published», file_id TG, дата. Снятие флага «сделать видео».</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Очистка VPS: удаление mp3, промежуточных mp4, SRT после публикации</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Error handling потока Б: перехват каждого этапа (ElevenLabs / HeyGen / FFmpeg / TG), детальные алерты, статус + описание ошибки в Sheets. Workflow НЕ падает полностью при ошибке одного шага.</td>
+    <td>1.5</td><td>3</td><td>7 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Code review / рефакторинг workflow Б: дублирование нод, таймауты, унификация с потоком А</td>
+    <td>1</td><td>2</td><td>5 000</td><td></td>
+  </tr>
+
+  <tr><td colspan="5" class="sub">— Тестирование и сдача —</td></tr>
+  <tr>
+    <td>Stage тестирование: 3 видео через тестовый аватар/голос (не тратить кредиты заказчика). Проверка всего pipeline.</td>
+    <td>2</td><td>3</td><td>7 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Приёмочное тестирование: 5 видео разных длительностей (30 сек, 60 сек, 90 сек, 2 мин, 3 мин) с аватаром заказчика. Публикация в TG-канал. Проверка субтитров, плашки, заставки, кружка.</td>
+    <td>4</td><td>6</td><td>15 000</td><td></td>
+  </tr>
+  <tr>
+    <td>Документация этапа 3: схема потока, FFmpeg команды с параметрами, процедура при сбое HeyGen, subтитры</td>
+    <td>2</td><td>2.5</td><td>6 250</td><td></td>
+  </tr>
+  <tr>
+    <td>Экспорт workflow JSON в GitHub</td>
+    <td>0.5</td><td>1</td><td>2 500</td><td></td>
+  </tr>
+
+  <tr class="risk">
+    <td>Тонкая настройка субтитров под конкретный голос/аватар заказчика: корректировка timing offset (голос ElevenLabs всегда немного опережает или отстаёт от видео HeyGen), подбор стиля отображения, тест на 5 реальных видео</td>
+    <td>1</td><td>3</td><td>7 500</td>
+    <td>Новая позиция v4.1. Субтитры, идеально работающие на тестовом аватаре, на реальном могут сдвигаться. Итерации неизбежны.</td>
+  </tr>
+
+  <tr class="stot">
+    <td>ИТОГО ЭТАП 3 (с ASR AssemblyAI)</td>
+    <td>~35</td><td><strong>~70</strong></td><td><strong>175 000</strong></td>
+    <td>включает тонкую настройку субтитров под аватар</td>
+  </tr>
+  <tr class="risk">
+    <td>Contingency 10% этапа 3 (нестабильность HeyGen, итерации FFmpeg под конкретный аватар, Telegram лимиты)</td>
+    <td>—</td><td><strong>5</strong></td><td><strong>15 000</strong></td>
+    <td>Выставляется по факту потраченного.</td>
+  </tr>
+  <tr class="stot">
+    <td>ИТОГО ЭТАП 3 с contingency</td>
+    <td>~35</td><td><strong>~75</strong></td><td><strong>190 000</strong></td>
+    <td></td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════ ОБЩИЙ БЛОК ═══════════════════════════ -->
+<h2>ОБЩИЙ БЛОК — Передача знаний и финальное E2E тестирование</h2>
+
+<table>
+  <tr>
+    <th style="width:38%">Задача</th>
+    <th style="width:6%">Опт</th>
+    <th style="width:6%">Реал</th>
+    <th style="width:12%">Сумма, руб</th>
+    <th style="width:38%">Комментарий</th>
+  </tr>
+
+  <tr>
+    <td>Финальное E2E тестирование: 10 полных циклов (текст + картинка + все каналы + видео) без вмешательства исполнителя. Фиксация всех инцидентов.</td>
+    <td>4</td><td>6</td><td>15 000</td>
+    <td>Проводится после стабильной работы всех этапов. Минимум 2 недели реальной работы.</td>
+  </tr>
+  <tr>
+    <td>Передача знаний: 2 онлайн-созвона с заказчиком (1 ч каждый): обзор системы, типичные сбои, как читать логи, как переавторизовать Claude Code</td>
+    <td>2</td><td>3</td><td>7 500</td><td></td>
+  </tr>
+  <tr>
+    <td>Loom-гайды (видео-записи экрана): переавторизация Claude Code, ручная публикация в Яндекс.Карты (фоллбек), чтение логов при сбое. По 5–10 мин каждый.</td>
+    <td>1.5</td><td>3</td><td>7 500</td>
+    <td>Новая позиция v4. Текстовых инструкций часто недостаточно.</td>
+  </tr>
+  <tr>
+    <td>Финальный README проекта: оглавление всей документации, схема архитектуры (ASCII или Mermaid), контакты и порядок эскалации при сбое</td>
+    <td>1</td><td>2</td><td>5 000</td><td></td>
+  </tr>
+  <tr>
+    <td>GitHub Actions: CI для проверки JSON-схемы workflow при push (валидность n8n JSON, наличие .env.example, отсутствие секретов)</td>
+    <td>1</td><td>2</td><td>5 000</td>
+    <td>Новая позиция v4. Защита от случайного коммита секретов.</td>
+  </tr>
+
+  <tr class="stot">
+    <td>ИТОГО ОБЩИЙ БЛОК</td>
+    <td>~10</td><td><strong>~16</strong></td><td><strong>40 000</strong></td>
+    <td>Новый блок v4.</td>
+  </tr>
+</table>
+
+<h2>ИТОГО ПО ПРОЕКТУ (v4.1, финальная)</h2>
+
+<table>
+  <tr>
+    <th>Этап / блок</th>
+    <th>Реал без contingency, ч</th>
+    <th>Contingency (10%), ч</th>
+    <th>Реал с contingency, ч</th>
+    <th>Сумма с contingency, руб</th>
+    <th>Срок</th>
+  </tr>
+  <tr>
+    <td>Этап 1 — Инфраструктура + Claude Code</td>
+    <td>40</td><td>5</td><td>45</td><td>110 000</td><td>1.5–2 нед</td>
+  </tr>
+  <tr>
+    <td>Этап 2 — Поток А (текстовый, 4 канала)</td>
+    <td>95</td><td>10</td><td>105</td><td>262 500</td><td>3.5–4.5 нед</td>
+  </tr>
+  <tr>
+    <td>Этап 3 — Поток Б (AI-видео, ASR)</td>
+    <td>70</td><td>5</td><td>75</td><td>190 000</td><td>2–2.5 нед</td>
+  </tr>
+  <tr>
+    <td>Общий блок — E2E тест + передача знаний + CI</td>
+    <td>15</td><td>—</td><td>15</td><td>40 000</td><td>распределено</td>
+  </tr>
+  <tr class="gtot">
+    <td>ВСЕГО (полный проект, ASR, contingency)</td>
+    <td><strong>220</strong></td><td><strong>20</strong></td><td><strong>240</strong></td><td><strong>602 500</strong></td><td><strong>8–10 недель</strong></td>
+  </tr>
+  <tr style="background:#d8d8d8; font-weight:bold;">
+    <td>Этапы 1+2 без видео (MVP) с contingency</td>
+    <td>135</td><td>15</td><td>150</td><td>372 500</td><td>5–7 недель</td>
+  </tr>
+  <tr style="background:#e8e8e8;">
+    <td>Опция: Redis + BullMQ очередь</td>
+    <td>—</td><td>—</td><td>+5</td><td>+15 000</td><td>+0.5 нед</td>
+  </tr>
+  <tr style="background:#e8e8e8;">
+    <td>Экономия: Вариант А субтитров (без ASR, письменное согласие)</td>
+    <td>—</td><td>—</td><td>-5</td><td>-12 500</td><td></td>
+  </tr>
+</table>
+
+<p><strong>Важно про contingency:</strong> это не «всегда выставляемая» сумма. Это потолок по непредвиденному. По каждому этапу contingency выставляется только в размере фактически потраченных сверх основной сметы часов. Если этап прошёл чисто — contingency = 0 руб.</p>
+
+<!-- ═══════════════════════════ ОПЕРАЦИОНКА ═══════════════════════════ -->
+<h2>Ежемесячные операционные расходы заказчика (после запуска)</h2>
+<p>Оплачивается заказчиком напрямую провайдерам. В стоимость работ не входит.</p>
+
+<table>
+  <tr>
+    <th style="width:25%">Сервис</th>
+    <th style="width:20%">Тариф</th>
+    <th style="width:20%">Стоимость</th>
+    <th style="width:35%">Примечание</th>
+  </tr>
+  <tr>
+    <td>VPS Ubuntu (2–4 vCPU / 4–8 GB RAM)</td>
+    <td>Timeweb / Selectel</td>
+    <td>700–2 500 руб/мес</td>
+    <td>4 vCPU рекомендуется если FFmpeg будет запускаться ежедневно</td>
+  </tr>
+  <tr>
+    <td>Claude Max подписка</td>
+    <td>$200/мес</td>
+    <td>~18 500 руб/мес</td>
+    <td>Уже есть. При слёте сессии — фоллбек на API (~300–800 руб/мес доп.)</td>
+  </tr>
+  <tr>
+    <td>Anthropic API (фоллбек)</td>
+    <td>Pay-per-use, Sonnet ~$3/1M токенов</td>
+    <td>300–800 руб/мес</td>
+    <td>Только при срабатывании фоллбека. В идеальном мире — 0.</td>
+  </tr>
+  <tr>
+    <td>Google Gemini Flash (тексты)</td>
+    <td>Pay-per-use</td>
+    <td>200–600 руб/мес</td>
+    <td>~120 запросов/мес</td>
+  </tr>
+  <tr>
+    <td>Google Imagen 3 / фоллбек (Recraft/Fal.ai)</td>
+    <td>~$0.04/картинка</td>
+    <td>~110–500 руб/мес</td>
+    <td>Зависит от выбранного сервиса</td>
+  </tr>
+  <tr>
+    <td>ElevenLabs</td>
+    <td>Creator $22/мес</td>
+    <td>~2 000 руб/мес</td>
+    <td>100k симв. При ежедневных видео может потребоваться Professional $99</td>
+  </tr>
+  <tr>
+    <td>HeyGen</td>
+    <td>Creator $29/мес (5 кред.)</td>
+    <td>~2 700–8 000 руб/мес</td>
+    <td class="warn">1 кредит ≈ 1 мин видео. При ежедневных видео нужен Business $89/мес. Уточнить частоту до старта.</td>
+  </tr>
+  <tr>
+    <td>AssemblyAI (субтитры)</td>
+    <td>$0.0115/мин аудио</td>
+    <td>~100–500 руб/мес</td>
+    <td>При 30 видео по 1.5 мин = ~63 руб. Фактически бесплатно.</td>
+  </tr>
+  <tr>
+    <td>UptimeRobot (мониторинг)</td>
+    <td>Бесплатный тариф</td>
+    <td>0 руб/мес</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Домен для n8n (если нет)</td>
+    <td>Reg.ru</td>
+    <td>~80–150 руб/мес</td>
+    <td></td>
+  </tr>
+  <tr class="stot">
+    <td>ИТОГО операционных расходов</td>
+    <td colspan="2">~24 000–34 000 руб/мес</td>
+    <td>Из них Claude Max (~18 500) уже есть. Без него: ~5 500–15 500/мес</td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════ СОГЛАШЕНИЯ ═══════════════════════════ -->
+<h2>Ключевые соглашения (фиксировать письменно до старта каждого этапа)</h2>
+
+<table>
+  <tr>
+    <th style="width:25%">Тема</th>
+    <th style="width:40%">Что фиксировать</th>
+    <th style="width:35%">Последствие если не зафиксировать</th>
+  </tr>
+  <tr class="risk">
+    <td>Claude Code авторизация</td>
+    <td>Сессия будет слетать. При слёте — ручное переподключение по инструкции (10–15 мин). До слёта — фоллбек на API работает автоматически. Это ограничение платформы Anthropic, не баг системы.</td>
+    <td>«Система сломана» = претензия к исполнителю после сдачи.</td>
+  </tr>
+  <tr class="risk">
+    <td>Субтитры (выбор варианта)</td>
+    <td>До оплаты этапа 3: письменный выбор Вариант А (±5 сек, дешевле на 12 500 руб) или Вариант Б (ASR, точная синхронизация). Претензии по синхронизации при выборе А — не принимаются.</td>
+    <td>«Субтитры не синхронны» = требование переделки после оплаты.</td>
+  </tr>
+  <tr class="risk">
+    <td>Яндекс.Бизнес API</td>
+    <td>Если API не поддерживает публикацию — реализуется уведомление для ручной публикации. Не баг, ограничение Яндекса.</td>
+    <td>«Автопубликация в Карты не работает» = претензия к исполнителю.</td>
+  </tr>
+  <tr class="risk">
+    <td>Imagen 3 geo-блок</td>
+    <td>Если недоступен из РФ — согласованная альтернатива (Recraft/Fal.ai). Качество может отличаться.</td>
+    <td>Заказчик не принимает альтернативу.</td>
+  </tr>
+  <tr>
+    <td>Аудит сайта</td>
+    <td>До начала блока «сайт»: заказчик предоставляет SFTP доступ. Без аудита — работы не начинаются.</td>
+    <td>Несовместимость структуры сайта выясняется в середине этапа 2.</td>
+  </tr>
+  <tr>
+    <td>HeyGen кредиты при тестировании</td>
+    <td>Тестирование требует минимум 20 кредитов (5 видео + итерации). Расход при тестировании — за счёт заказчика.</td>
+    <td>Исполнитель не может тестировать без кредитов.</td>
+  </tr>
+  <tr>
+    <td>Изменения API внешних сервисов</td>
+    <td>Изменения API HeyGen, Anthropic, Яндекс и т.д. после сдачи = платные доработки по договору поддержки. Не входит в гарантийный период.</td>
+    <td>«API Яндекса изменился, почините бесплатно».</td>
+  </tr>
+  <tr>
+    <td>Промпты — технический формат</td>
+    <td>Исполнитель адаптирует промпты заказчика под API-формат (убрать вводные фразы, добавить технические ограничения). Смысл промптов — только заказчик.</td>
+    <td>Система публикует посты с «Конечно! Вот ваш текст:» в начале.</td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════ ЭВОЛЮЦИЯ ═══════════════════════════ -->
+<h2>Эволюция сметы по версиям</h2>
+
+<table>
+  <tr>
+    <th>Версия</th>
+    <th>Часы (реал)</th>
+    <th>Сумма, руб</th>
+    <th>Ключевые добавления</th>
+  </tr>
+  <tr>
+    <td>v1</td>
+    <td>75 ч</td><td>187 500</td>
+    <td>Базовая оценка, оптимистичная</td>
+  </tr>
+  <tr>
+    <td>v2</td>
+    <td>161 ч</td><td>405 000</td>
+    <td>Реальные часы: Claude Code авторизация, geo-блок, аудит сайта, ASR субтитры, error trigger</td>
+  </tr>
+  <tr>
+    <td>v3</td>
+    <td>192 ч</td><td>482 500</td>
+    <td>Фоллбек Claude API, JSON-архитектура сайта, очередь, шлифовка промптов, частичный успех, мониторинг</td>
+  </tr>
+  <tr>
+    <td>v4</td>
+    <td>209 ч</td><td>522 500</td>
+    <td>Python wrapper + circuit breaker, pre-gen HTML + sitemap, HeyGen Webhook, FFmpeg presets, rate limiting, code review, Loom-гайды, GitHub Actions CI, E2E тест</td>
+  </tr>
+  <tr class="gtot">
+    <td>v4.1 (финальная, с contingency)</td>
+    <td><strong>240 ч</strong></td><td><strong>602 500</strong></td>
+    <td>+SEO-тест индексации, +тонкая настройка субтитров, +резерв сайта 5 ч, +contingency 10% по каждому этапу</td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════ ПОСТ-СОПРОВОЖДЕНИЕ ═══════════════════════════ -->
+<h2>Пост-сопровождение</h2>
+
+<table>
+  <tr>
+    <th style="width:25%">Услуга</th>
+    <th style="width:20%">Стоимость</th>
+    <th style="width:55%">Что включает / что НЕ включает</th>
+  </tr>
+  <tr>
+    <td>Гарантийный период</td>
+    <td>Бесплатно, 30 дней</td>
+    <td>Исправление багов в реализованной функциональности. НЕ включает: изменения API внешних сервисов, слёт Claude Code сессии (ограничение платформы), новый функционал.</td>
+  </tr>
+  <tr>
+    <td>Договор поддержки</td>
+    <td>15 000–25 000 руб/мес</td>
+    <td>Мониторинг workflow, правки при изменениях API внешних сервисов, консультации до 6 ч/мес, помощь при переавторизации Claude Code, обновления n8n (major версии).</td>
+  </tr>
+</table>
+
+<br>
+<p class="note">
+  Смета v4.1 (финальная). Ставка: 2 500 руб/ч. 240 часов с contingency / 602 500 руб. за полный проект с ASR.
+  MVP (этапы 1+2 без видео): ~372 500 руб / ~150 ч / 5–7 недель.
+  Contingency по каждому этапу — потолок, выставляется только по факту. Резервные позиции (Imagen фоллбек, Redis, резерв сайта) — аналогично.
+</p>
+
+</body>
+</html>
