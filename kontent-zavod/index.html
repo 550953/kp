@@ -2,144 +2,60 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>КП — Николай Шикин</title>
+    <title>Контент-завод — КП и смета</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            background: #fafafa;
-            color: #1a1a1a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 3rem auto;
+            padding: 1rem;
             line-height: 1.5;
-            padding: 2rem 1rem;
+            background: #fefefe;
         }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
+        .links {
+            margin: 2rem 0;
         }
-        .header {
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #e5e5e5;
-        }
-        h1 {
-            font-size: 1.75rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-        .sub {
-            color: #666;
-            font-size: 0.9rem;
-        }
-        .project-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.25rem 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid #eaeaea;
-            transition: all 0.2s ease;
-        }
-        .project-card:hover {
-            border-color: #ccc;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        .project-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        .project-title a {
-            color: #1a1a1a;
-            text-decoration: none;
-        }
-        .project-title a:hover {
-            color: #0066cc;
-        }
-        .project-desc {
-            color: #555;
-            font-size: 0.9rem;
-            margin-bottom: 0.75rem;
-        }
-        .file-list {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-top: 0.5rem;
-        }
-        .file-link {
+        a {
+            display: block;
+            padding: 0.75rem 1rem;
+            margin: 0.75rem 0;
             background: #f0f0f0;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-family: 'SF Mono', Monaco, monospace;
             color: #0066cc;
             text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
         }
-        .file-link:hover {
+        a:hover {
             background: #e0e0e0;
         }
-        .footer {
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e5e5e5;
-            font-size: 0.8rem;
-            color: #888;
-            text-align: center;
+        .desc {
+            color: #555;
+            font-size: 0.9rem;
+            margin-top: -0.5rem;
+            margin-bottom: 1.5rem;
         }
-        .badge {
-            display: inline-block;
-            background: #e8f0fe;
-            color: #0066cc;
-            font-size: 0.7rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 12px;
-            margin-left: 0.5rem;
-            vertical-align: middle;
+        hr {
+            margin: 2rem 0;
+            border: none;
+            border-top: 1px solid #ddd;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Николай Шикин <span class="badge">технический подрядчик</span></h1>
-            <div class="sub">Коммерческие предложения и сметы по проектам</div>
-        </div>
 
-        <!-- ПРОЕКТ 1: КОНТЕНТ-ЗАВОД -->
-        <div class="project-card">
-            <div class="project-title">
-                📄 Контент-завод (автопубликации + AI)
-            </div>
-            <div class="project-desc">
-                n8n · Claude Code · HeyGen · Imagen 3 · Telegram · Дзен · Яндекс.Карты · Сайт
-            </div>
-            <div class="file-list">
-                <a href="kontent-zavod/proposal.html" class="file-link">📋 proposal.html</a>
-                <a href="kontent-zavod/smeta.html" class="file-link">💰 smeta.html</a>
-            </div>
-        </div>
+<h2>📄 Контент-завод</h2>
+<div class="desc">Автопубликации + AI-видео · n8n · Claude · HeyGen</div>
 
-        <!-- ПРОЕКТ 2: ПРОПОВЕДИ.РФ (добавите позже) -->
-        <div class="project-card">
-            <div class="project-title">
-                📱 Проповеди.рф
-            </div>
-            <div class="project-desc">
-                Flutter · Android/iOS/Huawei · Офлайн-режим · Битрикс REST API
-            </div>
-            <div class="file-list">
-                <a href="propovedi-rf/proposal.html" class="file-link">📋 proposal.html (скоро)</a>
-            </div>
-        </div>
+<div class="links">
+    <a href="proposal.html">📋 Коммерческое предложение</a>
+    <a href="smeta.html">💰 Детальная смета (v4.1)</a>
+</div>
 
-        <div class="footer">
-            🔗 shikinn.com · <a href="https://github.com/shikinn/kp" style="color:#888;">GitHub</a>
-        </div>
-    </div>
+<hr>
+
+<div style="font-size: 0.8rem; color: #888;">
+    Исполнитель: Николай Шикин · <a href="https://kp.shikinn.com" style="display: inline; background: none; padding: 0; color: #888;">все проекты</a>
+</div>
+
 </body>
 </html>
