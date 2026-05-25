@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>КП — Николай Шикин</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #fafafa;
+            color: #1a1a1a;
+            line-height: 1.5;
+            padding: 2rem 1rem;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e5e5e5;
+        }
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .sub {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .project-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #eaeaea;
+            transition: all 0.2s ease;
+        }
+        .project-card:hover {
+            border-color: #ccc;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .project-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .project-title a {
+            color: #1a1a1a;
+            text-decoration: none;
+        }
+        .project-title a:hover {
+            color: #0066cc;
+        }
+        .project-desc {
+            color: #555;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+        .file-list {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+        .file-link {
+            background: #f0f0f0;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-family: 'SF Mono', Monaco, monospace;
+            color: #0066cc;
+            text-decoration: none;
+        }
+        .file-link:hover {
+            background: #e0e0e0;
+        }
+        .footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e5e5;
+            font-size: 0.8rem;
+            color: #888;
+            text-align: center;
+        }
+        .badge {
+            display: inline-block;
+            background: #e8f0fe;
+            color: #0066cc;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Николай Шикин <span class="badge">технический подрядчик</span></h1>
+            <div class="sub">Коммерческие предложения и сметы по проектам</div>
+        </div>
+
+        <!-- ПРОЕКТ 1: КОНТЕНТ-ЗАВОД -->
+        <div class="project-card">
+            <div class="project-title">
+                📄 Контент-завод (автопубликации + AI)
+            </div>
+            <div class="project-desc">
+                n8n · Claude Code · HeyGen · Imagen 3 · Telegram · Дзен · Яндекс.Карты · Сайт
+            </div>
+            <div class="file-list">
+                <a href="kontent-zavod/proposal.html" class="file-link">📋 proposal.html</a>
+                <a href="kontent-zavod/smeta.html" class="file-link">💰 smeta.html</a>
+            </div>
+        </div>
+
+        <!-- ПРОЕКТ 2: ПРОПОВЕДИ.РФ (добавите позже) -->
+        <div class="project-card">
+            <div class="project-title">
+                📱 Проповеди.рф
+            </div>
+            <div class="project-desc">
+                Flutter · Android/iOS/Huawei · Офлайн-режим · Битрикс REST API
+            </div>
+            <div class="file-list">
+                <a href="propovedi-rf/proposal.html" class="file-link">📋 proposal.html (скоро)</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            🔗 shikinn.com · <a href="https://github.com/shikinn/kp" style="color:#888;">GitHub</a>
+        </div>
+    </div>
+</body>
+</html>
